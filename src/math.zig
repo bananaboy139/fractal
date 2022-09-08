@@ -1,10 +1,14 @@
-const graphics = @cImport({
-    @cInclude("graphics.h");
+const ray = @cImport({
+    @cInclude("raylib.h");
 });
 const std = @import("std");
 const math = std.math;
 const cmath = math.complex;
 const Complex = cmath.Complex;
+
+const screenWidth = 800;
+const screenHeight = 450;
+
 //don't use outside of check
 fn check_error(guess: Complex(f64), ans: Complex(f64)) f64 {
     return cmath.abs(ans.sub(guess).div(ans)); //don't know how div works 
@@ -51,9 +55,8 @@ const Pixel = struct {
     trial: f64
 };
 fn draw() void {
-    var max_x: c_int = graphics.getmaxx();
-    var max_y: c_int = graphics.getmaxy();
-    graphics.rectangle(0, 0, max_x, max_y);
+    const max_x = screenWidth;
+    const max_y = screenHeight;
     //var list = std.ArrayList(Pixel).init(std.mem.Allocator);
     const scale = 10;
     const acc_err = 0.01;
@@ -73,16 +76,26 @@ fn draw() void {
             //     .y = y*scale,
             //     .trial = trial
             // };
-            //list.append(pix);
-            graphics.putpixel(@as(c_int, x*scale), @as(c_int, y*scale), @as(c_int, trial));
+            // list.append(pix);
             y += 1/scale;
         }
         x += 1/scale;
     }
 }
 
-fn main() void {
-    //var gd: c_int = DETECT, gm, errorcode;
-    graphics.initgraph(@as(c_int, 0), &gm, driver);
-    graphics.closegraph();
+pub fn main() void {
+
+    
+    ray.InitWindow(screenWidth, screenHeight, "fractal");
+    defer ray.CloseWindow();
+
+    ray.SetTargetFPS(30);
+
+    while (!ray.WindowShouldClose()) {
+        ray.BeginDrawing();
+        defer ray.EndDrawing();
+
+        ray.ClearBackground(ray.RAYWHITE);
+        ray.DrawText("Hello, World!", 190, 200, 20, ray.LIGHTGRAY);
+    }
 }
