@@ -87,19 +87,30 @@ fn draw(x_offset: i32, y_offset: i32, intensity: u16) void {
                 z = optimized(z);
                 trial += 1;
             }
-            const color = ray.GetColor(@intCast(c_uint, trial * intensity));
+            const color = ray.GetColor(@intCast(c_uint, trial * intensity) + 20_000);
             ray.DrawPixel(@intCast(c_int, (x-x_offset)), @intCast(c_int, (y-y_offset)), color);
             y += 1;
         }
         x += 1;
     }
 }
-
+// const print = std.debug.print;
+const Keys = enum(u16) {
+    right = 262,
+    left = 263,
+    up = 265,
+    down = 264,
+    space = 32,
+    shift = 340,
+    w = 87,
+    s = 83,
+};
+const step = 200;
 pub fn main() void {    
     ray.InitWindow(screenWidth, screenHeight, "fractal");
     defer ray.CloseWindow();
 
-    ray.SetTargetFPS(10);
+    ray.SetTargetFPS(60);
     var x_offset: i32 = -400;
     var y_offset: i32 = -400;
     var color: u16 = 1;
@@ -107,12 +118,37 @@ pub fn main() void {
         ray.BeginDrawing();
         defer ray.EndDrawing();
         ray.ClearBackground(ray.RAYWHITE);
-        color = (color + 1) % 20;
+        color = (color + 1);
         draw(x_offset, y_offset, color);
-        // var buf: []u8 = undefined;
-        // var c: c_int = ray.GetKeyPressed;
-        // var key: []u8 = @as(u32, c);
-        // const s = try std.fmt.bufPrint(buf, key);
-        // ray.DrawText(s, 190, 200, 20, ray.LIGHTGRAY);
+
+        switch (@intCast(i32, ray.GetKeyPressed())) {
+            @enumToInt(Keys.right) => {
+                x_offset += step;
+            },
+            @enumToInt(Keys.left) => {
+                x_offset -= step;
+            },
+            @enumToInt(Keys.up) => {
+                y_offset -= step;
+            },
+            @enumToInt(Keys.down) => {
+                y_offset += step;
+            },
+            else => {}
+
+            // @enumToInt(Keys.space)
+            // @enumToInt(Keys.shift)
+            // @enumToInt(Keys.w)
+            // @enumToInt(Keys.s)
+        }
+
+
+        // const k = @intCast(i32, ray.GetKeyPressed());
+        // if (k != 0) {
+        //     print("Key:{} ", .{k});
+        // }
+        
     }
 }
+//"C:\raylib\zig\zig.exe" build
+
