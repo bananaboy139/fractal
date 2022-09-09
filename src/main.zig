@@ -111,8 +111,8 @@ pub fn main() void {
     defer ray.CloseWindow();
 
     ray.SetTargetFPS(60);
-    var x_offset: i32 = -400;
-    var y_offset: i32 = -400;
+    var x_offset: i32 = -screenWidth/2;
+    var y_offset: i32 = -screenHeight/2;
     var color: u16 = 1;
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
