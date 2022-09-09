@@ -6,8 +6,8 @@ const math = std.math;
 const cmath = math.complex;
 const Complex = cmath.Complex;
 
-const screenWidth = 800;
-const screenHeight = 450;
+const screenWidth = 1200;
+const screenHeight = 850;
 
 //don't use outside of check
 fn check_error(guess: Complex(f64), ans: Complex(f64)) f64 {
@@ -71,49 +71,84 @@ const Pixel = struct {
     y: f64,
     trial: f64
 };
-fn draw() void {
+
+fn draw(x_offset: i32, y_offset: i32, intensity: u16) void {
     const max_x = screenWidth;
     const max_y = screenHeight;
-    //var list = std.ArrayList(Pixel).init(std.mem.Allocator);
-    const scale = 1;
     const acc_err = 0.1;
     const max_trial = 1_000;
-    var x: u32 = 1;
-    while (x < max_x/scale) {
-        var y: u32 = 1;
-        while (y < max_y/scale) {
+    var x: i32 = 0 + x_offset;
+    while (x < (max_x + x_offset)) {
+        var y: i32 = 0 + y_offset;
+        while (y < (max_y + y_offset)) {
             var trial: u16 = 0;
             var z = Complex(f64).init(@intToFloat(f64, x), @intToFloat(f64, y));
             while (check(z).err > acc_err and trial < max_trial) {
                 z = optimized(z);
                 trial += 1;
             }
-            const color = ray.GetColor(@intCast(c_uint, trial));
-            ray.DrawPixel(@intCast(c_int, x*scale), @intCast(c_int, y*scale), color);
-            // const pix = Pixel {
-            //     .x = x*scale,
-            //     .y = y*scale,
-            //     .trial = trial
-            // };
-            // list.append(pix);
-            y += 1/scale;
+            const color = ray.GetColor(@intCast(c_uint, trial * intensity) + 20_000);
+            ray.DrawPixel(@intCast(c_int, (x-x_offset)), @intCast(c_int, (y-y_offset)), color);
+            y += 1;
         }
-        x += 1/scale;
+        x += 1;
     }
 }
-
+// const print = std.debug.print;
+const Keys = enum(u16) {
+    right = 262,
+    left = 263,
+    up = 265,
+    down = 264,
+    space = 32,
+    shift = 340,
+    w = 87,
+    s = 83,
+};
+const step = 200;
 pub fn main() void {    
     ray.InitWindow(screenWidth, screenHeight, "fractal");
     defer ray.CloseWindow();
 
-    ray.SetTargetFPS(1);
-
+    ray.SetTargetFPS(60);
+    var x_offset: i32 = -screenWidth/2;
+    var y_offset: i32 = -screenHeight/2;
+    var color: u16 = 1;
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
         defer ray.EndDrawing();
         ray.ClearBackground(ray.RAYWHITE);
-        draw();
+        color = (color + 1);
+        draw(x_offset, y_offset, color);
+
+        switch (@intCast(i32, ray.GetKeyPressed())) {
+            @enumToInt(Keys.right) => {
+                x_offset += step;
+            },
+            @enumToInt(Keys.left) => {
+                x_offset -= step;
+            },
+            @enumToInt(Keys.up) => {
+                y_offset -= step;
+            },
+            @enumToInt(Keys.down) => {
+                y_offset += step;
+            },
+            else => {}
+
+            // @enumToInt(Keys.space)
+            // @enumToInt(Keys.shift)
+            // @enumToInt(Keys.w)
+            // @enumToInt(Keys.s)
+        }
+
+
+        // const k = @intCast(i32, ray.GetKeyPressed());
+        // if (k != 0) {
+        //     print("Key:{} ", .{k});
+        // }
         
-        //ray.DrawText("Hello, World!", 190, 200, 20, ray.LIGHTGRAY);
     }
 }
+//"C:\raylib\zig\zig.exe" build
+
