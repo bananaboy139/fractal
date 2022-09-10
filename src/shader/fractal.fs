@@ -94,10 +94,11 @@ void main() {
 	Complex_cartesian coor = Complex_cartesian((fragTexCoord.x + offset.x/screenDims.x)/zoom, (fragTexCoord.y + offset.y/screenDims.y)/zoom);
 	Complex_euler z = C_c__to__C_e(coor);
 	float trial = 0.0;
-	while ((check(C_e__to__C_c(z)) > acceptable_err) || (trial < max_trial)) {
+	while ((check(C_e__to__C_c(z)) > acceptable_err) && (trial < max_trial)) {
 		z = optimized(z);
 		trial += 1;
 	}
-	trial /= 1000;
-	color = vec4(2.0, trial, 4.0, 1.0);
+	trial /= 10;
+	// trial *= 10;
+	color = vec4(0, 0, trial, 1);
 }

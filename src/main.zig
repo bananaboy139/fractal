@@ -3,8 +3,8 @@ const ray = @cImport({
 });
 const std = @import("std");
 
-const screenWidth = 1200;
-const screenHeight = 850;
+const screenWidth = 1800;
+const screenHeight = 1250;
 
 // const print = std.debug.print;
 const Keys = enum(u16) {
@@ -75,6 +75,12 @@ pub fn main() void {
             },
             @enumToInt(Keys.down) => {
                 offset[1] += step;
+            },
+            @enumToInt(Keys.w) => {
+                zoom += 0.5;
+            },
+            @enumToInt(Keys.s) => {
+                zoom -= 0.5;
             },
             else => {}
 
