@@ -98,7 +98,7 @@ void main() {
 		z = optimized(z);
 		trial += 1;
 	}
-	trial /= 10;
+	trial /= 500;
 	// trial *= 10;
-	color = vec4(0, 0, trial, 1);
+	color = vec4(trial, trial, trial, 1);
 }

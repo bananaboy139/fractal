@@ -34,8 +34,8 @@ pub fn main() void {
     var _zoom: c_int = ray.GetShaderLocation(shader, "zoom");
     
     var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
-    var acceptable_err: f32 = 0.01;
-    var max_trial: c_int = 1_000;
+    var acceptable_err: f32 = 0.0001;
+    var max_trial: c_int = 100_000;
     var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
     var zoom: f32 = 1.0; 
 
@@ -77,10 +77,10 @@ pub fn main() void {
                 offset[1] += step;
             },
             @enumToInt(Keys.w) => {
-                zoom += 0.5;
+                zoom += 10;
             },
             @enumToInt(Keys.s) => {
-                zoom -= 0.5;
+                zoom -= 1;
             },
             else => {}
 
