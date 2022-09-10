@@ -24,8 +24,9 @@ pub fn main() void {
     ray.SetTargetFPS(60);
 
     var target: ray.RenderTexture2D = ray.LoadRenderTexture(ray.GetScreenWidth(), ray.GetScreenHeight());
-    var shader: ray.Shader = ray.LoadShader(0, "./shader/fractal.fs");
-    
+    var shader: ray.Shader = ray.LoadShader(0, "../src/shader/fractal.fs");
+    defer ray.UnloadShader(shader);
+
     var _screendims: c_int = ray.GetShaderLocation(shader, "screenDims");
     var _acceptable_err: c_int = ray.GetShaderLocation(shader, "acceptable_err");
     var _max_trial: c_int = ray.GetShaderLocation(shader, "max_trial");
@@ -34,7 +35,7 @@ pub fn main() void {
     
     var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
     var acceptable_err: f32 = 0.01;
-    var max_trial: c_int = 1_000;
+    var max_trial: c_int = 255;
     var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
     var zoom: f32 = 1.0; 
 
@@ -43,10 +44,7 @@ pub fn main() void {
     ray.SetShaderValue(shader, _max_trial, &max_trial, ray.SHADER_UNIFORM_INT);
     ray.SetShaderValue(shader, _offset, &offset, ray.SHADER_UNIFORM_VEC2);
     ray.SetShaderValue(shader, _zoom, &zoom, ray.SHADER_UNIFORM_FLOAT);
-
-  
-
-
+    
     while (!ray.WindowShouldClose()) {
         //DRAW
         ray.BeginTextureMode(target);
@@ -55,7 +53,7 @@ pub fn main() void {
 
         ray.BeginDrawing();
         defer ray.EndDrawing();
-        defer ray.UnloadShader(shader);
+        
         ray.ClearBackground(ray.RAYWHITE);
 
         ray.BeginShaderMode(shader);
