@@ -2,10 +2,15 @@
 
 #define PI 3.1415926538
 
-in vec2 position
-in float acceptable_err;
-in int max_trial;
-out int trial;
+in vec2 position;
+
+uniform vec2 screenDims;
+uniform float acceptable_err;
+uniform int max_trial;
+uniform vec2 offset;
+uniform float zoom;
+
+out vec4 color;
 
 struct Complex_cartesian {
 	float re;
@@ -84,11 +89,11 @@ Complex_euler optimized(Complex_euler z) {
 }
 
 void main() {
-	Complex_cartesian z = Complex_cartesian(position.x, position.y);
-	int trials = 0;
-	while (check_err(z) > acceptable_err || trials < max_trial) {
+	Complex_cartesian z = Complex_cartesian((position.x + offset.x/screenDims.x)/zoom, (position.y + offset.y/screenDims.y)/zoom);
+	float trial = 0.0;
+	while (check_err(z) > acceptable_err || trial < max_trial) {
 		z = optimized(z);
-		trials += 1;
+		trial += 1.0;
 	}
-	trial = trials;
+	color = vec4(trial, trial, trial, 1.0)
 }

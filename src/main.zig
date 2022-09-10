@@ -2,28 +2,10 @@ const ray = @cImport({
     @cInclude("C:/raylib/raylib/src/raylib.h");
 });
 const std = @import("std");
-const math = std.math;
 
 const screenWidth = 1200;
 const screenHeight = 850;
-var shader: ray.Shader = ray.LoadShader(0, ray.TextFormat("./shader/fractal.fs", 330));
-fn draw(x_offset: i32, y_offset: i32, intensity: u16) void {
-    const max_x = screenWidth;
-    const max_y = screenHeight;
-    const acc_err = 0.1;
-    const max_trial = 1_000;
-    var x: i32 = 0 + x_offset;
-    while (x < (max_x + x_offset)) {
-        var y: i32 = 0 + y_offset;
-        while (y < (max_y + y_offset)) {
-            //call shader
-            const color = ray.GetColor(@intCast(c_uint, trial * intensity) + 20_000);
-            ray.DrawPixel(@intCast(c_int, (x-x_offset)), @intCast(c_int, (y-y_offset)), color);
-            y += 1;
-        }
-        x += 1;
-    }
-}
+
 // const print = std.debug.print;
 const Keys = enum(u16) {
     right = 262,
@@ -39,31 +21,62 @@ const step = 200;
 pub fn main() void {    
     ray.InitWindow(screenWidth, screenHeight, "fractal");
     defer ray.CloseWindow();
-    
     ray.SetTargetFPS(60);
-    var x_offset: i32 = -screenWidth/2;
-    var y_offset: i32 = -screenHeight/2;
-    var color: u16 = 1;
+
+    var target: ray.RenderTexture2D = ray.LoadRenderTexture(ray.GetScreenWidth(), ray.GetScreenHeight());
+    var shader: ray.Shader = ray.LoadShader(0, "./shader/fractal.fs");
+    
+    var _screendims: c_int = ray.GetShaderLocation(shader, "screenDims");
+    var _acceptable_err: c_int = ray.GetShaderLocation(shader, "acceptable_err");
+    var _max_trial: c_int = ray.GetShaderLocation(shader, "max_trial");
+    var _offset: c_int = ray.GetShaderLocation(shader, "offset");
+    var _zoom: c_int = ray.GetShaderLocation(shader, "zoom");
+    
+    var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
+    var acceptable_err: f32 = 0.01;
+    var max_trial: c_int = 1_000;
+    var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
+    var zoom: f32 = 1.0; 
+
+    ray.SetShaderValue(shader, _screendims, &screendims, ray.SHADER_UNIFORM_VEC2);
+    ray.SetShaderValue(shader, _acceptable_err, &acceptable_err, ray.SHADER_UNIFORM_FLOAT);
+    ray.SetShaderValue(shader, _max_trial, &max_trial, ray.SHADER_UNIFORM_INT);
+    ray.SetShaderValue(shader, _offset, &offset, ray.SHADER_UNIFORM_VEC2);
+    ray.SetShaderValue(shader, _zoom, &zoom, ray.SHADER_UNIFORM_FLOAT);
+
+  
+
+
     while (!ray.WindowShouldClose()) {
+        //DRAW
+        ray.BeginTextureMode(target);
+            ray.DrawRectangle(0, 0, ray.GetScreenWidth(),ray.GetScreenHeight(), ray.BLACK);
+        ray.EndTextureMode();
+
         ray.BeginDrawing();
         defer ray.EndDrawing();
         defer ray.UnloadShader(shader);
         ray.ClearBackground(ray.RAYWHITE);
-        color = (color + 1);
-        draw(x_offset, y_offset, color);
+
+        ray.BeginShaderMode(shader);
+            ray.DrawTextureEx(target.texture, ray.Vector2 {.x = 0.0, .y = 0.0} , @as(f32, 0.0), @as(f32, 1.0), ray.WHITE);
+        ray.EndShaderMode();
+
+        ray.SetShaderValue(shader, _offset, &offset, ray.SHADER_UNIFORM_VEC2);
+        ray.SetShaderValue(shader, _zoom, &zoom, ray.SHADER_UNIFORM_FLOAT);
 
         switch (@intCast(i32, ray.GetKeyPressed())) {
             @enumToInt(Keys.right) => {
-                x_offset += step;
+                offset[0] += step;
             },
             @enumToInt(Keys.left) => {
-                x_offset -= step;
+                offset[0] -= step;
             },
             @enumToInt(Keys.up) => {
-                y_offset -= step;
+                offset[1] -= step;
             },
             @enumToInt(Keys.down) => {
-                y_offset += step;
+                offset[1] += step;
             },
             else => {}
 
@@ -78,7 +91,8 @@ pub fn main() void {
         // if (k != 0) {
         //     print("Key:{} ", .{k});
         // }
-        
+
+
     }
 }
 //"C:\raylib\zig\zig.exe" build
