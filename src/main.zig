@@ -35,7 +35,7 @@ pub fn main() void {
     
     var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
     var acceptable_err: f32 = 0.01;
-    var max_trial: c_int = 255;
+    var max_trial: c_int = 1_000;
     var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
     var zoom: f32 = 1.0; 
 

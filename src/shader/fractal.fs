@@ -96,7 +96,8 @@ void main() {
 	float trial = 0.0;
 	while ((check(C_e__to__C_c(z)) > acceptable_err) || (trial < max_trial)) {
 		z = optimized(z);
-		trial += 1.0;
+		trial += 1;
 	}
-	color = vec4(trial/2, fragTexCoord.x, 2.0, 1.0);
+	trial /= 1000;
+	color = vec4(2.0, trial, 4.0, 1.0);
 }
