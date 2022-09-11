@@ -8,23 +8,12 @@ uniform float acceptable_err;
 uniform int max_trial;
 uniform vec2 offset;
 uniform float zoom;
-
+uniform vec2 z_1;
+uniform vec2 z_2;
+uniform vec2 z_3;
 out vec4 color;
 
 
-const float PI = 3.1415926535;
-
-//euler to cartesian
-vec2 C_e__to__C_c(vec2 z) {
-	float a = z.x * cos(z.y);
-	float b = z.x * sin(z.y);
-	return(vec2(a, b));
-}
-
-//absolute answers
-vec2 z_1 = C_e__to__C_c(vec2(1, 0));
-vec2 z_2 = C_e__to__C_c(vec2(1, 2.0*PI/3.0));
-vec2 z_3 = C_e__to__C_c(vec2(1, 4.0*PI/3.0));
 vec2 answers[3] = vec2[3](z_1, z_2, z_3);
 
 float check_err(vec2 guess, vec2 ans) {
@@ -58,11 +47,11 @@ vec2 optimized(vec2 z) {
 void main() {
 	vec2 z = vec2((fragTexCoord.x + offset.x/screenDims.x)/zoom, (fragTexCoord.y + offset.y/screenDims.y)/zoom);
 	float trial = 0.0;
-	while ((check(C_e__to__C_c(z)) > acceptable_err) && (trial < max_trial)) {
+	while ((check(z) > acceptable_err) && (trial < max_trial)) {
 		z = optimized(z);
-		trial += 1;
+		trial += 0.1;
 	}
-	// trial /= 500;
+	trial /= 500;
 	// trial *= 10;
-	color = vec4(trial, trial, trial, 1);
+	color = vec4(0, 0, trial, 1);
 }
