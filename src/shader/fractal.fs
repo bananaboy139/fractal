@@ -49,9 +49,9 @@ void main() {
 	float trial = 0.0;
 	while ((check(z) > acceptable_err) && (trial < max_trial)) {
 		z = optimized(z);
-		trial += 0.1;
+		trial += 1;
 	}
-	trial /= 500;
+	trial /= 10000;
 	// trial *= 10;
-	color = vec4(0, 0, trial, 1);
+	color = vec4(trial, trial, trial, 1);
 }
