@@ -35,10 +35,17 @@ float check(vec2 guess) {
 	return(errs[0]);
 }
 
+vec2 C_mul(vec2 z, vec2 c) {
+	return(vec2(
+		(z.x * c.x) - (z.y * c.y),
+		(z.x * c.y) + (z.y * c.x) 
+	));
+}
+
 vec2 optimized(vec2 z) {
 	//2z^3+1 / 3*z^2
-	vec2 z_2 = z * z;
-	vec2 z_3 = z_2 * z;
+	vec2 z_2 = C_mul(z, z);
+	vec2 z_3 = C_mul(z_2, z);
 	vec2 top = (2 * z_3) + 1;
 	vec2 bottom = 3 * z_2;
 	return(top / bottom);
@@ -51,7 +58,7 @@ void main() {
 		z = optimized(z);
 		trial += 1;
 	}
-	trial /= 10000;
+	trial /= 100;
 	// trial *= 10;
 	color = vec4(trial, trial, trial, 1);
 }
