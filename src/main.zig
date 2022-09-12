@@ -56,7 +56,7 @@ pub fn main() void {
     var acceptable_err: f32 = 0.1;
     var max_trial: c_int = 1_000;
     var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
-    var zoom: f32 = 0.1;
+    var zoom: f32 = 0.00001;
 
     ray.SetShaderValue(shader, _z_1, &z_1, ray.SHADER_UNIFORM_VEC2);
     ray.SetShaderValue(shader, _z_2, &z_2, ray.SHADER_UNIFORM_VEC2);
@@ -101,10 +101,10 @@ pub fn main() void {
                 offset[1] += step;
             },
             @enumToInt(Keys.w) => {
-                zoom += 1;
+                zoom *= 2;
             },
             @enumToInt(Keys.s) => {
-                zoom -= 1;
+                zoom /= 2;
             },
             else => {}
 

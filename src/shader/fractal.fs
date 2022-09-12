@@ -1,5 +1,4 @@
 #version 330
-
 in vec2 fragTexCoord;
 in vec4 fragColor;
 
@@ -74,14 +73,14 @@ vec2 optimized(vec2 z) {
 }
 
 void main() {
-	vec2 z = vec2((fragTexCoord.x + offset.x/screenDims.x)/zoom, (fragTexCoord.y + offset.y/screenDims.y)/zoom);
+	vec2 z = vec2(((fragTexCoord.x + offset.x/screenDims.x)/zoom), ((fragTexCoord.y + offset.y/screenDims.y)/zoom));
 	float trial = 0.0;
 	while ((check(z) > acceptable_err) && (trial < max_trial)) {
 		z = optimized(z);
 		trial += 1;
 	}
-	trial /= 1000;
+	trial /= 100;
 	// trial *= 10;
-	color = vec4(trial, trial, trial, 1);
+	color = vec4(1, trial, trial, 1);
 	
 }
