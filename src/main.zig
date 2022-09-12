@@ -2,9 +2,23 @@ const ray = @cImport({
     @cInclude("C:/raylib/raylib/src/raylib.h");
 });
 const std = @import("std");
+const math = std.math;
+const screenWidth = 800;
+const screenHeight = 605;
 
-const screenWidth = 1800;
-const screenHeight = 1250;
+//real ans
+const PI: f32 = 3.1415926535;
+
+//euler to cartesian
+fn C_e__to__C_c(z: [2]f32) [2]f32 {
+    var a: f32 = z[0] * math.cos(z[1]);
+    var b: f32 = z[0] * math.sin(z[1]);
+    return [2]f32{a, b};
+}
+
+const z_1: [2]f32 = C_e__to__C_c([2]f32{1, 0});
+const z_2: [2]f32  = C_e__to__C_c([2]f32{1, 2.0*PI/3.0});
+const z_3: [2]f32  = C_e__to__C_c([2]f32{1, 4.0*PI/3.0});
 
 // const print = std.debug.print;
 const Keys = enum(u16) {
@@ -18,10 +32,12 @@ const Keys = enum(u16) {
     s = 83,
 };
 const step = 200;
+
+
 pub fn main() void {    
     ray.InitWindow(screenWidth, screenHeight, "fractal");
     defer ray.CloseWindow();
-    ray.SetTargetFPS(60);
+    ray.SetTargetFPS(20);
 
     var target: ray.RenderTexture2D = ray.LoadRenderTexture(ray.GetScreenWidth(), ray.GetScreenHeight());
     var shader: ray.Shader = ray.LoadShader(0, "../src/shader/fractal.fs");
@@ -32,13 +48,21 @@ pub fn main() void {
     var _max_trial: c_int = ray.GetShaderLocation(shader, "max_trial");
     var _offset: c_int = ray.GetShaderLocation(shader, "offset");
     var _zoom: c_int = ray.GetShaderLocation(shader, "zoom");
-    
-    var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
-    var acceptable_err: f32 = 0.0001;
-    var max_trial: c_int = 100_000;
-    var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
-    var zoom: f32 = 1.0; 
+    var _z_1: c_int = ray.GetShaderLocation(shader, "z_1");
+    var _z_2: c_int = ray.GetShaderLocation(shader, "z_2");
+    var _z_3: c_int = ray.GetShaderLocation(shader, "z_3");
 
+    var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
+    var acceptable_err: f32 = 0.1;
+    var max_trial: c_int = 1_000;
+    var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
+    var zoom: f32 = 0.00001;
+
+    ray.SetShaderValue(shader, _z_1, &z_1, ray.SHADER_UNIFORM_VEC2);
+    ray.SetShaderValue(shader, _z_2, &z_2, ray.SHADER_UNIFORM_VEC2);
+    ray.SetShaderValue(shader, _z_3, &z_3, ray.SHADER_UNIFORM_VEC2);
+
+    ray.SetShaderValue(shader, _screendims, &screendims, ray.SHADER_UNIFORM_VEC2);
     ray.SetShaderValue(shader, _screendims, &screendims, ray.SHADER_UNIFORM_VEC2);
     ray.SetShaderValue(shader, _acceptable_err, &acceptable_err, ray.SHADER_UNIFORM_FLOAT);
     ray.SetShaderValue(shader, _max_trial, &max_trial, ray.SHADER_UNIFORM_INT);
@@ -77,10 +101,10 @@ pub fn main() void {
                 offset[1] += step;
             },
             @enumToInt(Keys.w) => {
-                zoom += 10;
+                zoom *= 2;
             },
             @enumToInt(Keys.s) => {
-                zoom -= 1;
+                zoom /= 2;
             },
             else => {}
 
