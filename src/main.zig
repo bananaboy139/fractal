@@ -3,8 +3,8 @@ const ray = @cImport({
 });
 const std = @import("std");
 const math = std.math;
-const screenWidth = 1800;
-const screenHeight = 1205;
+const screenWidth = 800;
+const screenHeight = 605;
 
 //real ans
 const PI: f32 = 3.1415926535;
@@ -37,7 +37,7 @@ const step = 200;
 pub fn main() void {    
     ray.InitWindow(screenWidth, screenHeight, "fractal");
     defer ray.CloseWindow();
-    ray.SetTargetFPS(60);
+    ray.SetTargetFPS(20);
 
     var target: ray.RenderTexture2D = ray.LoadRenderTexture(ray.GetScreenWidth(), ray.GetScreenHeight());
     var shader: ray.Shader = ray.LoadShader(0, "../src/shader/fractal.fs");
@@ -53,10 +53,10 @@ pub fn main() void {
     var _z_3: c_int = ray.GetShaderLocation(shader, "z_3");
 
     var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
-    var acceptable_err: f32 = 0.001;
+    var acceptable_err: f32 = 0.01;
     var max_trial: c_int = 1_000;
     var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
-    var zoom: f32 = 1.0;
+    var zoom: f32 = 0.1;
 
     ray.SetShaderValue(shader, _z_1, &z_1, ray.SHADER_UNIFORM_VEC2);
     ray.SetShaderValue(shader, _z_2, &z_2, ray.SHADER_UNIFORM_VEC2);
@@ -101,10 +101,10 @@ pub fn main() void {
                 offset[1] += step;
             },
             @enumToInt(Keys.w) => {
-                zoom += 10;
+                zoom += 1;
             },
             @enumToInt(Keys.s) => {
-                zoom -= 10;
+                zoom -= 1;
             },
             else => {}
 

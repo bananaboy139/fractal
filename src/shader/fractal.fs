@@ -11,13 +11,42 @@ uniform float zoom;
 uniform vec2 z_1;
 uniform vec2 z_2;
 uniform vec2 z_3;
+
 out vec4 color;
+
+vec2 C_add(vec2 z, vec2 c) {
+	return(vec2(
+		z.x + c.x,
+		z.y + c.y
+	));
+}
+
+vec2 C_mul(vec2 z, vec2 c) {
+	return(vec2(
+		(z.x * c.x) - (z.y * c.y),
+		(z.x * c.y) + (z.y * c.x) 
+	));
+}
+
+vec2 C_div(vec2 z, vec2 c) {
+	return(vec2(
+		((z.x * c.x + z.y * c.y) / (c.x * c.x + c.y * c.y)),
+		((z.y * c.x - z.x * c.y) / (c.x * c.x + c.y * c.y))
+	));
+}
+
+vec2 C_sub(vec2 z, vec2 c) {
+	return(vec2(
+		z.x - c.x,
+		z.y - c.y
+	));
+}
 
 
 vec2 answers[3] = vec2[3](z_1, z_2, z_3);
 
 float check_err(vec2 guess, vec2 ans) {
-	return(length((ans - guess) / ans));
+	return(length(C_div(C_sub(ans, guess), ans)));
 }
 
 float check(vec2 guess) {
@@ -35,20 +64,13 @@ float check(vec2 guess) {
 	return(errs[0]);
 }
 
-vec2 C_mul(vec2 z, vec2 c) {
-	return(vec2(
-		(z.x * c.x) - (z.y * c.y),
-		(z.x * c.y) + (z.y * c.x) 
-	));
-}
-
 vec2 optimized(vec2 z) {
 	//2z^3+1 / 3*z^2
 	vec2 z_2 = C_mul(z, z);
 	vec2 z_3 = C_mul(z_2, z);
-	vec2 top = (2 * z_3) + 1;
-	vec2 bottom = 3 * z_2;
-	return(top / bottom);
+	vec2 top = C_add(C_add(z_3, z_3), vec2(2, 0));
+	vec2 bottom = C_add(C_add(z_2, z_2), z_2);
+	return(C_div(top, bottom));
 }
 
 void main() {
@@ -58,7 +80,8 @@ void main() {
 		z = optimized(z);
 		trial += 1;
 	}
-	trial /= 100;
+	// trial /= 100;
 	// trial *= 10;
-	color = vec4(trial, trial, trial, 1);
+	color = vec4(0, 0, trial, 1);
+	
 }
