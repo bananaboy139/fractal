@@ -53,7 +53,7 @@ pub fn main() void {
     var _z_3: c_int = ray.GetShaderLocation(shader, "z_3");
 
     var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
-    var acceptable_err: f32 = 0.01;
+    var acceptable_err: f32 = 0.1;
     var max_trial: c_int = 1_000;
     var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
     var zoom: f32 = 0.1;
