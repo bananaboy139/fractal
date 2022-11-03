@@ -1,5 +1,5 @@
-const ray = @cImport({
-    @cInclude("C:/raylib/raylib/src/raylib.h");
+const glew = @cImport({
+    @cInclude("../glew-2.1.0/include/GL/glew.h");
 });
 const std = @import("std");
 const math = std.math;
@@ -7,18 +7,18 @@ const screenWidth = 800;
 const screenHeight = 605;
 
 //real ans
-const PI: f32 = 3.1415926535;
+const PI: f64 = 3.1415926535;
 
 //euler to cartesian
-fn C_e__to__C_c(z: [2]f32) [2]f32 {
-    var a: f32 = z[0] * math.cos(z[1]);
-    var b: f32 = z[0] * math.sin(z[1]);
-    return [2]f32{a, b};
+fn C_e__to__C_c(z: [2]f64) [2]f64 {
+    var a: f64 = z[0] * math.cos(z[1]);
+    var b: f64 = z[0] * math.sin(z[1]);
+    return [2]f64{a, b};
 }
 
-const z_1: [2]f32 = C_e__to__C_c([2]f32{1, 0});
-const z_2: [2]f32  = C_e__to__C_c([2]f32{1, 2.0*PI/3.0});
-const z_3: [2]f32  = C_e__to__C_c([2]f32{1, 4.0*PI/3.0});
+const z_1: [2]f64 = C_e__to__C_c([2]f64{1, 0});
+const z_2: [2]f64  = C_e__to__C_c([2]f64{1, 2.0*PI/3.0});
+const z_3: [2]f64  = C_e__to__C_c([2]f64{1, 4.0*PI/3.0});
 
 // const print = std.debug.print;
 const Keys = enum(u16) {
@@ -52,11 +52,11 @@ pub fn main() void {
     var _z_2: c_int = ray.GetShaderLocation(shader, "z_2");
     var _z_3: c_int = ray.GetShaderLocation(shader, "z_3");
 
-    var screendims = [2]f32{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
-    var acceptable_err: f32 = 0.1;
+    var screendims = [2]f64{@intToFloat(f32, ray.GetScreenWidth()), @intToFloat(f32, ray.GetScreenHeight())};
+    var acceptable_err: f64 = 0.1;
     var max_trial: c_int = 1_000;
-    var offset = [2]f32{@intToFloat(f32, -ray.GetScreenWidth())/2.0, @intToFloat(f32, -ray.GetScreenHeight())/2.0};
-    var zoom: f32 = 0.00001;
+    var offset = [2]f64{@intToFloat(f64, -ray.GetScreenWidth())/2.0, @intToFloat(f64, -ray.GetScreenHeight())/2.0};
+    var zoom: f64 = 0.00001;
 
     ray.SetShaderValue(shader, _z_1, &z_1, ray.SHADER_UNIFORM_VEC2);
     ray.SetShaderValue(shader, _z_2, &z_2, ray.SHADER_UNIFORM_VEC2);
